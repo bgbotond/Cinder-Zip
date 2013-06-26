@@ -1,0 +1,3 @@
+[submodule "zipengine"]
+	path = zipengine
+	url = https://github.com/bgbotond/zipengine
