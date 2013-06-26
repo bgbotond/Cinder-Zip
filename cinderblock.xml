@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<cinder>
+<block
+	name="Zip"
+	id="org.libcinder.Zip"
+	author="btd"
+	summary="This is the Zip CinderBlock, designed for use with the open-source C++ library Cinder"
+	core="true"
+	>
+	<sourcePattern>src/*.cpp</sourcePattern>
+	<headerPattern>src/*.h</headerPattern>
+	<includePath>zipengine/include</includePath>
+	<includePath>zipengine/include/zlib</includePath>
+</block>
+</cinder>
