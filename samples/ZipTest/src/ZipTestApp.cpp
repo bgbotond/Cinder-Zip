@@ -12,20 +12,20 @@ public:
 	void update();
 	void draw();
 private:
-	mndl::ZipArchive* mZipArchive;
+	mndl::ZipArchiveRef mZipArchive;
 };
 
 void CinderProjectApp::setup()
 {
 	fs::path zipName( ci::app::getAssetPath( "test.zip" ));
 
-	mZipArchive = new mndl::ZipArchive( zipName, "password" );
+	mZipArchive = mndl::ZipArchive::create( zipName, "password" );
 
 	std::vector< ci::fs::path > files = mZipArchive->getFiles();
 
-	ci::DataSourceRef bufferPng = mZipArchive->open( "bin/test.png" );
-	ci::DataSourceRef bufferUni = mZipArchive->open( "test.uni" );
-	ci::DataSourceRef bufferTxt = mZipArchive->open( "test.txt" );
+	ci::DataSourceRef bufferPng = mZipArchive->loadFile( "bin/test.png" );
+	ci::DataSourceRef bufferUni = mZipArchive->loadFile( "test.uni" );
+	ci::DataSourceRef bufferTxt = mZipArchive->loadFile( "test.txt" );
 }
 
 void CinderProjectApp::update()

@@ -6,6 +6,11 @@ using namespace std;
 
 namespace mndl
 {
+	ZipArchiveRef ZipArchive::create( const fs::path& path, const std::string& password )
+	{
+		return ZipArchiveRef( new ZipArchive( path, password ) );
+	}
+
 	ZipArchive::ZipArchive( const fs::path& path, const std::string& password )
 		: mPath( path )
 		, mPassword( password )
@@ -77,7 +82,7 @@ namespace mndl
 		return files;
 	}
 
-	DataSourceRef ZipArchive::open( const ci::fs::path& file )
+	DataSourceRef ZipArchive::loadFile( const ci::fs::path& file )
 	{
 		if( mUnzip )
 		{

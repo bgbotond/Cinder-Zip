@@ -1,10 +1,12 @@
 #pragma once 
 
 #include "cinder/DataSource.h"
-#include "zipengine/unzip.h"
+#include "unzip.h"
 
 namespace mndl
 {
+	typedef std::shared_ptr< class ZipArchive > ZipArchiveRef;
+
 	class ZipArchive
 	{
 	protected:
@@ -18,13 +20,16 @@ namespace mndl
 		typedef std::vector< FileInfo > FileInfoList;
 
 	public:
-		ZipArchive( const ci::fs::path& path, const std::string& password );
+		static ZipArchiveRef create( const ci::fs::path& path, const std::string& password );
+
 		~ZipArchive();
 
 		std::vector< ci::fs::path > getFiles();
-		ci::DataSourceRef           open( const ci::fs::path& file );
+		ci::DataSourceRef           loadFile( const ci::fs::path& file );
 
 	protected:
+		ZipArchive( const ci::fs::path& path, const std::string& password );
+
 		bool makeCurrentFile( const ci::fs::path& file );
 		void load();
 
