@@ -24,13 +24,15 @@ namespace mndl
 
 		~ZipArchive();
 
-		std::vector< ci::fs::path > getFiles();
+		std::vector< ci::fs::path > getFiles( const ci::fs::path& path = ci::fs::path() ) const;
+		std::vector< ci::fs::path > getDirectories( const ci::fs::path& path = ci::fs::path() ) const;
 		ci::DataSourceRef           loadFile( const ci::fs::path& file );
+		bool                        hasFile( const ci::fs::path& file ) const;
 
 	protected:
 		ZipArchive( const ci::fs::path& path, const std::string& password );
 
-		bool makeCurrentFile( const ci::fs::path& file );
+		bool makeCurrentFile( const ci::fs::path& file ) const;
 		void load();
 
 	protected:

@@ -52,7 +52,7 @@ namespace mndl
 		}
 	}
 
-	bool ZipArchive::makeCurrentFile( const ci::fs::path& file )
+	bool ZipArchive::makeCurrentFile( const ci::fs::path& file ) const
 	{
 		if( ! mUnzip )
 			return false;
@@ -62,24 +62,49 @@ namespace mndl
 			char fileName[1024];
 			unzGetCurrentFileInfo( mUnzip, 0, fileName, 1024, 0, 0, 0, 0 );
 
-			if( file.string() == fileName )
+			if( file.compare( std::string( fileName ) ) == 0 )
 				return true;
 		}
 
 		return false;
 	}
 
-	vector< fs::path > ZipArchive::getFiles()
+	vector< fs::path > ZipArchive::getFiles( const ci::fs::path& path ) const
 	{
 		vector< fs::path > files;
 
 		for( auto it = mFileInfos.begin(); it != mFileInfos.end(); ++it )
 		{
-			if( it->mPath.has_filename() ) 
+			// inside the zip we cannot use is_regular_file function
+			if( it->mPath.filename().string() != "." )
+			{
+				if( ! path.empty() && it->mPath.string().find( path.string() ) != 0 )
+					continue;
+
 				files.push_back( it->mPath );
+			}
 		}
 
 		return files;
+	}
+
+	vector< fs::path > ZipArchive::getDirectories( const ci::fs::path& path ) const
+	{
+		vector< fs::path > directories;
+
+		for( auto it = mFileInfos.begin(); it != mFileInfos.end(); ++it )
+		{
+			// inside the zip we cannot use is_directoy function
+			if( it->mPath.filename().string() == "." )
+			{
+				if( ! path.empty() && it->mPath.string().find( path.string() ) != 0 )
+					continue;
+
+				directories.push_back( it->mPath );
+			}
+		}
+
+		return directories;
 	}
 
 	DataSourceRef ZipArchive::loadFile( const ci::fs::path& file )
@@ -113,6 +138,29 @@ namespace mndl
 		}
 
 		return DataSourceBuffer::create( Buffer() );
+	}
+
+	bool ZipArchive::hasFile( const ci::fs::path& file ) const
+	{
+		if( mUnzip )
+		{
+			if( makeCurrentFile( file ) )
+			{
+				int ret;
+
+				if( mPassword.empty() )
+					ret = unzOpenCurrentFile( mUnzip );
+				else
+					ret = unzOpenCurrentFilePassword( mUnzip, mPassword.c_str() );
+
+				if( ret == UNZ_OK )
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 } // namespace mndl
