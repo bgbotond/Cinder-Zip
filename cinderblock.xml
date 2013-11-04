@@ -16,6 +16,12 @@
 		</platform>
 	</platform>
 	<platform os="macosx">
+		<platform config="Debug">
+			<staticLibrary>lib/macosx/libzipengine_d.a</staticLibrary>
+		</platform>
+		<platform config="release">
+			<staticLibrary>lib/macosx/libzipengine.a</staticLibrary>
+		</platform>
 	</platform>
 	<sourcePattern>src/*.cpp</sourcePattern>
 	<headerPattern>src/*.h</headerPattern>

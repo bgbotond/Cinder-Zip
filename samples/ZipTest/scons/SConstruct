@@ -1,0 +1,9 @@
+env = Environment()
+
+env['APP_TARGET'] = 'ZipTestApp'
+env['APP_SOURCES'] = ['ZipTestApp.cpp']
+env['ASSETS'] = ['test.zip']
+
+env = SConscript('../../../scons/SConscript', exports = 'env')
+
+SConscript('../../../../../scons/SConscript', exports = 'env')
