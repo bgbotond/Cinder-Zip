@@ -1,0 +1,25 @@
+Import('env')
+
+_INCLUDES = [Dir('../src').abspath, Dir('../zipengine/include/').abspath]
+
+_SOURCES = ['CinderZip.cpp']
+_SOURCES = [File('../src/' + s).abspath for s in _SOURCES]
+
+DEBUG = int(ARGUMENTS.get('DEBUG', '0'))
+if DEBUG:
+	_LIBS = ['libzipengine_d.a']
+else:
+	_LIBS = ['libzipengine.a']
+
+if env['PLATFORM'] == 'darwin':
+	_LIBS = [Dir('../lib/macosx/').abspath + '/' + s for s in _LIBS]
+else:
+	_LIBS = []
+
+_LIBS = [File(s) for s in _LIBS]
+
+env.Append(APP_SOURCES = _SOURCES)
+env.Append(CPPPATH = _INCLUDES)
+env.Append(LIBS = _LIBS)
+
+Return('env')
