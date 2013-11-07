@@ -163,7 +163,7 @@ namespace mndl
 		return false;
 	}
 
-	vector< fs::path > ZipArchive::saveFiles( const fs::path& path ) const
+	vector< fs::path > ZipArchive::saveFiles( const fs::path& path, const fs::path& outDir ) const
 	{
 		vector< fs::path > files = getFiles( path );
 		vector< fs::path > savedFiles;
@@ -173,7 +173,12 @@ namespace mndl
 			fs::path filePath = *it;
 			DataSourceRef dataSource = loadFile( filePath );
 
-			fs::path savedFile = mPath.parent_path() / filePath;
+			fs::path savedFile;
+
+			if( outDir.empty() )
+				savedFile = mPath.parent_path() / filePath;
+			else
+				savedFile = outDir / filePath;
 
 			fs::path dirPath = savedFile.parent_path();
 			fs::create_directories( dirPath );

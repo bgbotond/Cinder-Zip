@@ -28,7 +28,7 @@ namespace mndl
 		std::vector< ci::fs::path > getDirectories( const ci::fs::path& path = ci::fs::path() ) const;
 		ci::DataSourceRef           loadFile( const ci::fs::path& file ) const;
 		bool                        hasFile( const ci::fs::path& file ) const;
-		std::vector< ci::fs::path > saveFiles( const ci::fs::path& path ) const;
+		std::vector< ci::fs::path > saveFiles( const ci::fs::path& path, const ci::fs::path& outDir = ci::fs::path() ) const;
 
 	protected:
 		ZipArchive( const ci::fs::path& path, const std::string& password );
