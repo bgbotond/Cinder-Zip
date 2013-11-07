@@ -1,3 +1,5 @@
+#include "cinder/DataTarget.h"
+
 #include "CinderZip.h"
 
 using namespace ci;
@@ -6,12 +8,12 @@ using namespace std;
 
 namespace mndl
 {
-	ZipArchiveRef ZipArchive::create( const fs::path& path, const std::string& password )
+	ZipArchiveRef ZipArchive::create( const fs::path& path, const string& password )
 	{
 		return ZipArchiveRef( new ZipArchive( path, password ) );
 	}
 
-	ZipArchive::ZipArchive( const fs::path& path, const std::string& password )
+	ZipArchive::ZipArchive( const fs::path& path, const string& password )
 		: mPath( path )
 		, mPassword( password )
 		, mUnzip( 0 )
@@ -27,7 +29,6 @@ namespace mndl
 			mUnzip = 0;
 		}
 	}
-
 
 	void ZipArchive::load()
 	{
@@ -52,7 +53,7 @@ namespace mndl
 		}
 	}
 
-	bool ZipArchive::makeCurrentFile( const ci::fs::path& file ) const
+	bool ZipArchive::makeCurrentFile( const fs::path& file ) const
 	{
 		if( ! mUnzip )
 			return false;
@@ -62,14 +63,14 @@ namespace mndl
 			char fileName[1024];
 			unzGetCurrentFileInfo( mUnzip, 0, fileName, 1024, 0, 0, 0, 0 );
 
-			if( file.compare( std::string( fileName ) ) == 0 )
+			if( file.compare( string( fileName ) ) == 0 )
 				return true;
 		}
 
 		return false;
 	}
 
-	vector< fs::path > ZipArchive::getFiles( const ci::fs::path& path ) const
+	vector< fs::path > ZipArchive::getFiles( const fs::path& path ) const
 	{
 		vector< fs::path > files;
 
@@ -88,7 +89,7 @@ namespace mndl
 		return files;
 	}
 
-	vector< fs::path > ZipArchive::getDirectories( const ci::fs::path& path ) const
+	vector< fs::path > ZipArchive::getDirectories( const fs::path& path ) const
 	{
 		vector< fs::path > directories;
 
@@ -107,7 +108,7 @@ namespace mndl
 		return directories;
 	}
 
-	DataSourceRef ZipArchive::loadFile( const ci::fs::path& file )
+	DataSourceRef ZipArchive::loadFile( const fs::path& file ) const
 	{
 		if( mUnzip )
 		{
@@ -125,7 +126,7 @@ namespace mndl
 					unz_file_info fileInfo;
 					unzGetCurrentFileInfo( mUnzip, &fileInfo, 0, 0, 0, 0, 0, 0 );
 
-					ci::Buffer buffer( fileInfo.uncompressed_size );
+					Buffer buffer( fileInfo.uncompressed_size );
 
 					int ret2 = unzReadCurrentFile( mUnzip, buffer.getData(), buffer.getDataSize() );
 
@@ -140,7 +141,7 @@ namespace mndl
 		return DataSourceBuffer::create( Buffer() );
 	}
 
-	bool ZipArchive::hasFile( const ci::fs::path& file ) const
+	bool ZipArchive::hasFile( const fs::path& file ) const
 	{
 		if( mUnzip )
 		{
@@ -161,6 +162,27 @@ namespace mndl
 		}
 
 		return false;
+	}
+
+	vector< fs::path > ZipArchive::saveFiles( const fs::path& path ) const
+	{
+		vector< fs::path > files = getFiles( path );
+		vector< fs::path > savedFiles;
+
+		for( auto it = files.begin(); it != files.end(); ++it )
+		{
+			fs::path filePath = *it;
+			DataSourceRef dataSource = loadFile( filePath );
+
+			fs::path savedFile = mPath.parent_path() / filePath;
+
+			DataTargetPathRef dataTargetFile = writeFile( savedFile );
+			dataTargetFile->getStream()->writeData( dataSource->getBuffer().getData(), dataSource->getBuffer().getDataSize());
+
+			savedFiles.push_back( savedFile );
+		}
+
+		return savedFiles;
 	}
 
 } // namespace mndl
