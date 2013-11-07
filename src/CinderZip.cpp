@@ -5,7 +5,6 @@
 using namespace ci;
 using namespace std;
 
-
 namespace mndl
 {
 	ZipArchiveRef ZipArchive::create( const fs::path& path, const string& password )
@@ -175,6 +174,9 @@ namespace mndl
 			DataSourceRef dataSource = loadFile( filePath );
 
 			fs::path savedFile = mPath.parent_path() / filePath;
+
+			fs::path dirPath = savedFile.parent_path();
+			fs::create_directories( dirPath );
 
 			DataTargetPathRef dataTargetFile = writeFile( savedFile );
 			dataTargetFile->getStream()->writeData( dataSource->getBuffer().getData(), dataSource->getBuffer().getDataSize());
